@@ -2,6 +2,8 @@ import numpy as np
 import matplotlib.pyplot as pyplot
 from scipy.interpolate import griddata
 from . import kernels
+import pystan
+import pickle
 
 def show_soundfield(ax_, 
                     r_xy, 
@@ -36,7 +38,7 @@ def stack_block_covariance(Krr, Kri, Kir, Kii):
     K = np.concatenate(
         (np.concatenate((Krr, Kri), axis=-1),
          np.concatenate((Kir, Kii), axis=-1)),
-        axis=0,
+        axis=-2,
     )
     return K
 
@@ -45,9 +47,26 @@ def construct_complex_covariance(Krr, Kii, Kri):
     Kp = Krr - Kii + 1j * (Kri.T + Kri)
     return K, Kp
 
-def show_kernel(ax, kernel_name, x = np.linspace(0, 10, 100), normalize=False, **kwargs):
+def show_kernel(ax, 
+                kernel_name, 
+                x = np.linspace(0, 10, 100), 
+                normalize=False, 
+                dim='1D',
+                **kwargs):
     k_uu = getattr(kernels, kernel_name)
     K = k_uu(x1=x, x2=x, **kwargs)
+
     if normalize:
         K /= np.max(K)
-    ax.plot(x, K[0], label=kernel_name)
+    if dim=='1D':
+        ax.plot(x, K[0, 0], label=kernel_name)
+    if dim=='2D':
+        ax.imshow(K[0], extent= [x[:, 0].min(), x[:, 0].max(), x[:, 1].min(), x[:, 1].max()])
+
+def compile_model(model_name, model_path, compiled_save_path):
+    with open(model_path+model_name+'.stan', "r") as f:
+        model_code = f.read()
+    # Stan compilation
+    model = pystan.StanModel(model_code=model_code)
+    # Save model
+    pickle.dump(model, open(compiled_save_path + model_name + ".pkl", "wb"))
