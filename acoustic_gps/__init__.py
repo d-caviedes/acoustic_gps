@@ -96,13 +96,21 @@ def predict(x,
                      'nij, nkj -> nik',
                      np.linalg.inv(K_zz + noise),
                      K_zsz)
-             )
-             + delta*np.identity(y_mean.shape[-1])
+                )
              )
     if sample:
+        delta_ = np.copy(delta)
         cholesky = np.empty(y_cov.shape)
         for i in range(y_mean.shape[0]):
-            cholesky[i] = np.linalg.cholesky(y_cov[i])
+            # while np.all(np.linalg.eigvals(y_cov[i]) > 0) == False:
+            while True:
+                try: 
+                    cholesky[i] = np.linalg.cholesky(y_cov[i])
+                    break
+                except np.linalg.LinAlgError:
+                    y_cov[i] += delta_ * np.identity(y_mean.shape[-1])
+                    delta_ *= 10
+            delta_ = np.copy(delta)              
         y_samples = (y_mean + np.einsum('nij, nj -> ni', cholesky, np.random.randn(*y_mean.shape)))
         del cholesky
     else:
@@ -120,11 +128,13 @@ def fit(model_path,
         ):
     model = pickle.load(open(model_path, "rb"))
 
-    posterior = model.sampling(
+    posterior_ = model.sampling(
         data=data,
         iter=n_samples,
         warmup=warmup_samples,
         chains=chains,
         pars=pars
     )
-    return posterior
+    posterior_samples = posterior_.extract(pars = pars, permuted=True)
+    posterior_summary = posterior_.summary(pars = pars)
+    return posterior_samples, posterior_summary
