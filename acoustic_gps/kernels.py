@@ -3,7 +3,7 @@
 import numpy as np
 
 
-def rbf(x1, x2, params):
+def rbf_isotropic(x1, x2, params):
     """Radial basis function iso and anisotropic
 
     Parameters
@@ -41,6 +41,82 @@ def rbf(x1, x2, params):
     )
     return K
 
+def rbf_anisotropic(x1, x2, params):
+    """Radial basis function iso and anisotropic
+
+    Parameters
+    ----------
+    x1 : array [N_positions1, N_dimensions]
+    x2 : array [N_positions2, N_dimensions]
+    params: dict
+        alpha : [N_samples]
+            Scale factor
+        rho : array [N_samples, N_dimensions]
+            Length scale
+    Returns
+    -------
+    array [N_samples, N_positions1, N_positions2]
+        Covariance function
+    """
+    alpha = params['alpha']
+    rho = params['rho']
+    directions = params['directions']
+
+    x1 = np.einsum("dj, ij -> id", directions, x1)
+    x2 = np.einsum("dj, ij -> id", directions, x2)
+    D = x1[:, None] - x2[None]
+
+    K = np.einsum(
+        'n, nij -> nij',
+        alpha ** 2,
+        np.exp(
+            -np.einsum(
+                "ijd, nd -> nij",
+                D ** 2,
+                1 / (2 * rho ** 2)
+            )
+        )
+    )
+    return K
+
+def rbf_anisotropic_periodic(x1, x2, params):
+    """Radial basis function iso and anisotropic
+
+    Parameters
+    ----------
+    x1 : array [N_positions1, N_dimensions]
+    x2 : array [N_positions2, N_dimensions]
+    params: dict
+        alpha : [N_samples]
+            Scale factor
+        rho : array [N_samples, N_dimensions]
+            Length scale
+    Returns
+    -------
+    array [N_samples, N_positions1, N_positions2]
+        Covariance function
+    """
+    alpha = params['alpha']
+    rho = params['rho']
+    directions = params['directions']
+    k = params['k']
+
+    x1 = np.einsum("dj, ij -> id", directions, x1)
+    x2 = np.einsum("dj, ij -> id", directions, x2)
+    D = x1[:, None] - x2[None]
+
+    K = np.einsum(
+        'n, nij -> nij',
+        alpha ** 2,
+        np.exp(
+            -np.einsum(
+                "ijd, nd -> nij",
+                np.sin(k*np.abs(D)/2) ** 2,
+                1 / (2 * rho ** 2)
+            )
+        )
+    )
+    return K
 
 def sinc(x1, x2, params):
     """Summary
