@@ -184,3 +184,18 @@ def nmse(y_meas, y_predicted, axis=(-1,)):
         norm *= y_meas.shape[i]
     nmse = np.sum(np.abs(y_meas - y_predicted)**2/np.abs(y_meas)**2, axis = axis) / norm
     return nmse
+
+def find_nearest(array, value):
+    """Find nearest value in an array and its index.
+
+    Returns
+    -------
+    value
+        Value of nearest entry in array
+    idx
+        Index of that value
+    """
+    idx = []
+    for val in value:
+        idx.append((np.abs(array - val)).argmin())
+    return array[idx], idx
