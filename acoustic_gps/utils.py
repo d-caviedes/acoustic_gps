@@ -129,6 +129,8 @@ def split_covariance_in_blocks(K):
 def show_kernel(ax, 
                 kernel_name, 
                 x = np.linspace(0, 10, 100), 
+                color = 'C0',
+                alpha = 1,
                 normalize=False, 
                 dim='1D',
                 **kwargs):
@@ -155,7 +157,7 @@ def show_kernel(ax,
     if normalize:
         K /= np.max(K)
     if dim=='1D':
-        ax.plot(x, K[0, 0], label=kernel_name)
+        ax.plot(x, K[0, 0], label=kernel_name, color = color, alpha = alpha)
     if dim=='2D':
         ax.imshow(K[0], extent= [x[:, 0].min(), x[:, 0].max(), x[:, 1].min(), x[:, 1].max()])
 
