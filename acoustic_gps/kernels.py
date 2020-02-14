@@ -1,6 +1,7 @@
 """Summary
 """
 import numpy as np
+import scipy as sc
 
 
 def rbf_isotropic(x1, x2, params):
