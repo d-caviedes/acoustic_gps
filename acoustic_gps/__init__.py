@@ -12,7 +12,7 @@ def predict(x,
             xs,
             y,
             sigma=0,  # noise
-            kernel_names=['rbf', 'rbf', 'zero', 'zero'],  # [uu, vv, uv, vu]
+            kernel_names=['rbf', 'rbf', 'zero', 'zero'],  # [uu, vv, uv, vu] TODO: Change to dictionary instead of positional
             axis=-1,
             delta=1e-12,
             sample=False,
@@ -102,7 +102,6 @@ def predict(x,
         delta_ = np.copy(delta)
         cholesky = np.empty(y_cov.shape)
         for i in range(y_mean.shape[0]):
-            # while np.all(np.linalg.eigvals(y_cov[i]) > 0) == False:
             while True:
                 try: 
                     cholesky[i] = np.linalg.cholesky(y_cov[i])

@@ -6,6 +6,7 @@ from scipy.interpolate import griddata
 from . import kernels
 import pystan
 import pickle
+from scipy import stats
 
 def show_soundfield(ax_, 
                     r_xy, 
@@ -161,6 +162,13 @@ def show_kernel(ax,
     if dim=='2D':
         ax.imshow(K[0], extent= [x[:, 0].min(), x[:, 0].max(), x[:, 1].min(), x[:, 1].max()])
 
+def compute_kernel(kernel_name,
+                   x=np.linspace(0, 10, 100),
+                   **kwargs):
+    k = getattr(kernels, kernel_name)
+    K = k(x1=x, x2=x, **kwargs)
+    return K
+
 def compile_model(model_name, model_path, compiled_save_path):
     """Summary
     
@@ -201,3 +209,12 @@ def find_nearest(array, value):
     for val in value:
         idx.append((np.abs(array - val)).argmin())
     return array[idx], idx
+
+def plot_kde(ax, y, resolution = 1000, **kwargs):
+    xmin = min(y)
+    xmax = max(y)
+    xvector = np.linspace(xmin, xmax, resolution)
+    Y_kde = stats.gaussian_kde(y)
+    ax.plot(
+            xvector, Y_kde.pdf(xvector) / Y_kde.pdf(xvector).max(), **kwargs
+        )

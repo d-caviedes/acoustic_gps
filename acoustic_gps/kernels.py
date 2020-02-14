@@ -139,6 +139,27 @@ def sinc(x1, x2, params):
     K = np.einsum('n, ij -> nij',alpha ** 2, np.sinc(k*np.sqrt(np.sum(D**2, axis=-1))/(np.pi)))
     return K
 
+def bessel0(x1, x2, params):
+    """Summary
+
+    Parameters
+    ----------
+    x1 : array [N_positions1, N_dimensions]
+    x2 : array [N_positions2, N_dimensions]
+    params: dict
+        alpha : [N_samples]
+            Scale factor
+    Returns
+    -------
+    TYPE
+        Description
+    """
+    k = params['k']
+    alpha = params['alpha']
+    D = x1[:, None] - x2[None]
+    K = np.einsum('n, ij -> nij',alpha ** 2, sc.special.jv(0, k*np.sqrt(np.sum(D**2, axis=-1))))
+    return K
+
 
 # def plane_wave(x1, x2, k, alpha):
 #     """Summary
