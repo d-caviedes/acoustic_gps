@@ -1,5 +1,6 @@
 """Summary
 """
+from mpl_toolkits.mplot3d import Axes3D
 import numpy as np
 import matplotlib.pyplot as pyplot
 from scipy.interpolate import griddata
@@ -7,6 +8,75 @@ from . import kernels
 import pystan
 import pickle
 from scipy import stats
+
+def show_soundfield_3D(ax_, 
+                    r_xy, 
+                    p, 
+                    lim=None, 
+                    what = 'phase',
+                    **kwargs):
+    """Summary
+    
+    Parameters
+    ----------
+    ax_ : TYPE
+        Description
+    r_xy : TYPE
+        Description
+    p : TYPE
+        Description
+    lim : None, optional
+        Description
+    what : str, optional
+        Description
+    **kwargs
+        Description
+    
+    Returns
+    -------
+    TYPE
+        Description
+    """
+    # get dimensions from r_mics and define interpolation grid
+    if what == 'phase':
+        z = np.angle(p)
+    if what == 'spl':
+        z = 20 * np.log10(np.abs(p)/2e-5)
+    if what == None:
+        z = p
+    xmin, ymin = r_xy.min(axis=1)
+    xmax, ymax = r_xy.max(axis=1)
+    xg = np.linspace(xmin, xmax, 100)
+    yg = np.linspace(ymin, ymax, 100)
+    Xg, Yg = np.meshgrid(xg, yg)
+    if lim is None:
+        lim = (z.min(), z.max())
+
+    # interpolate data on grid
+    zg = griddata(
+        (r_xy[0], r_xy[1]), z, (Xg.ravel(), Yg.ravel()), method="cubic"
+    )
+    Zg = zg.reshape(Xg.shape)
+    cs = ax_.plot_surface(Xg, Yg, Zg, linewidth=0, antialiased=False, **kwargs)
+    # ax_.set_aspect("equal")
+    return cs
+
+def grid_data(r_xy, 
+            z,
+            density):
+    """Summary
+    """
+    xmin, ymin = r_xy.min(axis=1)
+    xmax, ymax = r_xy.max(axis=1)
+    xg = np.linspace(xmin, xmax, density)
+    yg = np.linspace(ymin, ymax, density)
+    Xg, Yg = np.meshgrid(xg, yg)
+    zg = griddata(
+        (r_xy[0], r_xy[1]), z, (Xg.ravel(), Yg.ravel()), method="cubic"
+    )
+    Zg = zg.reshape(Xg.shape)
+    return Xg, Yg, Zg
+
 
 def show_soundfield(ax_, 
                     r_xy, 
