@@ -10,7 +10,7 @@ import pickle
 from scipy import stats
 
 def show_soundfield_3D(ax_, 
-                    r_xy, 
+                    xs, 
                     p, 
                     lim=None, 
                     what = 'phase',
@@ -21,7 +21,7 @@ def show_soundfield_3D(ax_,
     ----------
     ax_ : TYPE
         Description
-    r_xy : TYPE
+    xs : TYPE
         Description
     p : TYPE
         Description
@@ -44,8 +44,8 @@ def show_soundfield_3D(ax_,
         z = 20 * np.log10(np.abs(p)/2e-5)
     if what == None:
         z = p
-    xmin, ymin = r_xy.min(axis=1)
-    xmax, ymax = r_xy.max(axis=1)
+    xmin, ymin = xs.min(axis=1)
+    xmax, ymax = xs.max(axis=1)
     xg = np.linspace(xmin, xmax, 100)
     yg = np.linspace(ymin, ymax, 100)
     Xg, Yg = np.meshgrid(xg, yg)
@@ -54,7 +54,7 @@ def show_soundfield_3D(ax_,
 
     # interpolate data on grid
     zg = griddata(
-        (r_xy[0], r_xy[1]), z, (Xg.ravel(), Yg.ravel()), method="cubic"
+        (xs[0], xs[1]), z, (Xg.ravel(), Yg.ravel()), method="cubic"
     )
     Zg = zg.reshape(Xg.shape)
     cs = ax_.plot_surface(Xg, Yg, Zg, linewidth=0, antialiased=False, **kwargs)
@@ -251,6 +251,8 @@ def compile_model(model_name, model_path, compiled_save_path):
     compiled_save_path : TYPE
         Description
     """
+    # model_path = pathlib.Path(model_path)
+    # model_name = pathlib.Path(model_name)
     with open(model_path+model_name+'.stan', "r") as f:
         model_code = f.read()
     # Stan compilation
