@@ -2,12 +2,28 @@ import numpy as np
 from pyDOE import lhs
 import random
 
-def init_model(x, model, n_basis_functions):
+def init_model(x, kernel, n_basis_functions):
+    """Load necessary parameters for both Bayesian inference and predictions
+
+    Parameters
+    ----------
+    x : ndarray [N_locations, spatial dimensions]
+        Measured locations on the sound field
+    kernel : str
+        kernel name
+    n_basis_functions : [type]
+        [description]
+
+    Returns
+    -------
+    [type]
+        [description]
+    """     
     stan_params = {}
     kernel_names = {}
     kernel_params = {}
     prior_params  = {}
-    if model == 'rbf_isotropic':
+    if kernel == 'rbf_isotropic':
         # RBF Isotropic
         prior_params  = dict(
             D=x.shape[1],
@@ -21,7 +37,7 @@ def init_model(x, model, n_basis_functions):
             "rbf_isotropic", "rbf_isotropic", "zero", "zero"]
         kernel_params = ["alpha", "rho"]
 
-    if model == 'rbf_anisotropic':
+    if kernel == 'rbf_anisotropic':
 
         stan_params = ["alpha", "rho", "tau_alpha", "tau_rho"]
         kernel_names = [
@@ -44,7 +60,7 @@ def init_model(x, model, n_basis_functions):
             directions=posible_directions,
         )
 
-    if model == 'rbf_anisotropic_periodic':
+    if kernel == 'rbf_anisotropic_periodic':
 
         stan_params = ["alpha", "rho", "tau_alpha", "tau_rho"]
         kernel_names = [
@@ -65,7 +81,7 @@ def init_model(x, model, n_basis_functions):
             directions=posible_directions,
         )
 
-    if model == 'plane_wave_hierarchical':
+    if kernel == 'plane_wave_hierarchical':
         stan_params= ["alpha", "b", "b_log"]
         kernel_names= ["cosine", "cosine", "sine", "sine_neg"]
         kernel_params= ["alpha"]
@@ -85,7 +101,7 @@ def init_model(x, model, n_basis_functions):
             b_log_std= 1 # prior std of the b hyperparameter
         )
 
-    if model == 'bessel_isotropic':
+    if kernel == 'bessel_isotropic':
         stan_params = ["alpha", "tau_alpha"]
         kernel_names = ["bessel0", "bessel0", "zero", "zero"]
         kernel_params = ["alpha"]

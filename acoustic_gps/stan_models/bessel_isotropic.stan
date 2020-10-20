@@ -11,7 +11,7 @@ functions {
           K[i, j] =  alpha^2;  
         }
         else{
-          K[i, j] =  (alpha^2 * sin(k * distance(x[i],x[j]))) / (k * distance(x[i],x[j]));
+          K[i, j] =  (alpha^2 * bessel_first_kind(0, k * distance(x[i],x[j])));
         }
         K[j, i] = K[i, j];
       }

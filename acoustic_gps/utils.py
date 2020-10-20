@@ -58,7 +58,7 @@ def show_soundfield_3D(ax_,
     )
     Zg = zg.reshape(Xg.shape)
     cs = ax_.plot_surface(Xg, Yg, Zg, linewidth=0, antialiased=False, **kwargs)
-    # ax_.set_aspect("equal")
+    ax_.set_aspect("equal")
     return cs
 
 def grid_data(r_xy, 

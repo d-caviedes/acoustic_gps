@@ -137,3 +137,23 @@ def fit(model_path,
     posterior_samples = posterior_.extract(pars = pars, permuted=True)
     posterior_summary = posterior_.summary(pars = pars)
     return posterior_samples, posterior_summary
+
+def map_estimation(model_path,
+        data,
+        n_samples=300,
+        warmup_samples=150,
+        chains=3,
+        pars=['alpha']
+        ):
+    model = pickle.load(open(model_path, "rb"))
+
+    posterior_ = model.sampling(
+        data=data,
+        iter=n_samples,
+        warmup=warmup_samples,
+        chains=chains,
+        pars=pars
+    )
+    posterior_samples = posterior_.extract(pars = pars, permuted=True)
+    posterior_summary = posterior_.summary(pars = pars)
+    return posterior_samples, posterior_summary
