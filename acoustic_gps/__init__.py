@@ -136,7 +136,7 @@ def mc_sampling(model_path,
     posterior_summary = posterior_.summary(pars = pars)
     return posterior_samples, posterior_summary
 
-def map_estimation(model_path,
+def map_estimation(model_path, # TODO: implement this properly
         data,
         seed = 1000,
         iter = 1e6,

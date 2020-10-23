@@ -228,7 +228,7 @@ def random_locations(n_mics_zone, n_rows, n_cols):
 def plot_inference_summaries(data, posterior_samples, posterior_summary):
     rhat_color = 'C3'
     ax = [[] for i in range(len(posterior_samples.keys()))]
-    fig = plt.figure(figsize=(10, 10))
+    fig = plt.figure(figsize=(5, 7))
     nrows = len(posterior_samples.keys())
     ncols = 1
     spec = gridspec.GridSpec(nrows=nrows, ncols=ncols, figure=fig)
@@ -289,5 +289,6 @@ def plot_reconstruction(xs, x, p_true, p_predict, uncertainty):
     ax_true.set_title('true sound field')
     ax_predict.set_title('mean prediction')
     ax_uncertainty.set_title('uncertainty')
-    ax_uncertainty.scatter(x[:, 0], x[:, 1], marker='s', color = 'r')
+    ax_uncertainty.plot(x[:, 0], x[:, 1], marker='s', linestyle = '', color = 'yellowgreen', markeredgecolor = 'k')
+    ax_true.plot(x[:, 0], x[:, 1], marker='s', linestyle = '', color = 'yellowgreen', markeredgecolor = 'k')
     plt.tight_layout()
