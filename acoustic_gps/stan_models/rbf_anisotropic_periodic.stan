@@ -29,7 +29,7 @@ data {
   vector[2*N_meas] y[N_reps];           // Measured Pressure at receivers
   vector[2] directions[D];            // possible plane wave directions
   vector[2] x[N_meas];
-  real<lower=0> sigma;                     // Noise
+  matrix[2*N_meas, 2*N_meas] Sigma;                     // Noise
   real a_tau_rho;
   vector[D] b_tau_rho;
   real a_tau_alpha;
@@ -63,7 +63,7 @@ transformed parameters{
   K_rbf = rbf_periodic(x_projected, k, alpha, rho);
   K = append_row(append_col(K_rbf, K_zeros), 
                  append_col(K_zeros', K_rbf)) +
-                 diag_matrix(rep_vector(square(sigma), 2*N_meas)) + 
+                 Sigma + 
                  delta;
   L_K = cholesky_decompose(K);
 }

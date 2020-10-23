@@ -11,7 +11,7 @@ import pystan
 def predict(x,
             xs,
             y,
-            sigma=0,  # noise
+            Sigma,  # noise
             kernel_names=['rbf', 'rbf', 'zero', 'zero'],  # [uu, vv, uv, vu] TODO: Change to dictionary instead of positional
             axis=-1,
             delta=1e-12,
@@ -23,7 +23,7 @@ def predict(x,
         x (TYPE, optional): Description
         xs (TYPE, optional): Description
         y (TYPE, optional): Description
-        sigma (int, optional): Description
+        Sigma (int, optional): Description
         kernel_name (str, optional): Description
         N_samples (int, optional): Description
         axis (TYPE, optional): Description
@@ -76,15 +76,13 @@ def predict(x,
                                           K_xsxs_vv)
 
     del K_xsxs_uu, K_xsxs_vv, K_xsxs_uv, K_xsxs_vu
-
-    noise = sigma**2 * np.identity(y.shape[axis])
     # Construct bivariate covariance
     y_mean = np.einsum(
         'nij, nj -> ni',
         K_zsz,
         np.einsum(
             'nij, j -> ni',
-            np.linalg.inv(K_zz + noise),
+            np.linalg.inv(K_zz + Sigma),
             y
         )
     )
@@ -94,7 +92,7 @@ def predict(x,
                  K_zsz,
                  np.einsum(
                      'nij, nkj -> nik',
-                     np.linalg.inv(K_zz + noise),
+                     np.linalg.inv(K_zz + Sigma),
                      K_zsz)
                 )
              )
@@ -118,7 +116,7 @@ def predict(x,
     return y_mean, y_cov, y_samples
 
 
-def fit(model_path,
+def mc_sampling(model_path,
         data,
         n_samples=300,
         warmup_samples=150,
@@ -140,20 +138,19 @@ def fit(model_path,
 
 def map_estimation(model_path,
         data,
-        n_samples=300,
-        warmup_samples=150,
-        chains=3,
-        pars=['alpha']
+        seed = 1000,
+        iter = 1e6,
+        algorithm = 'LBFGS',
+        tol_rel_grad = 1e7
+
         ):
     model = pickle.load(open(model_path, "rb"))
 
-    posterior_ = model.sampling(
+    map = model.optimizing(
         data=data,
-        iter=n_samples,
-        warmup=warmup_samples,
-        chains=chains,
-        pars=pars
+        seed=seed, 
+        iter=iter,
+        algorithm=algorithm,
+        tol_rel_grad = tol_rel_grad
     )
-    posterior_samples = posterior_.extract(pars = pars, permuted=True)
-    posterior_summary = posterior_.summary(pars = pars)
-    return posterior_samples, posterior_summary
+    return map

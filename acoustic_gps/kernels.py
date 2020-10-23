@@ -148,7 +148,7 @@ def bessel0(x1, x2, params):
     x1 : array [N_positions1, N_dimensions]
     x2 : array [N_positions2, N_dimensions]
     params: dict
-        alpha : [N_samples]
+        sigma : [N_samples]
             Scale factor
     Returns
     -------
@@ -156,9 +156,9 @@ def bessel0(x1, x2, params):
         Description
     """
     k = params['k']
-    alpha = params['alpha']
+    sigma = params['sigma']
     D = x1[:, None] - x2[None]
-    K = np.einsum('n, ij -> nij',alpha ** 2, sc.special.jv(0, k*np.sqrt(np.sum(D**2, axis=-1))))
+    K = np.einsum('n, ij -> nij',sigma ** 2, sc.special.jv(0, k*np.sqrt(np.sum(D**2, axis=-1))))
     return K
 
 
@@ -196,7 +196,7 @@ def cosine(x1, x2, params):
     x1 : array [N_positions1, N_dimensions]
     x2 : array [N_positions2, N_dimensions]
     params: dict
-        alpha : [N_samples]
+        sigma_l : [N_samples]
             Scale factor
         k : wavenumber
 
@@ -206,12 +206,12 @@ def cosine(x1, x2, params):
         Description
     """
     k = params['k']
-    alpha = params['alpha']
+    sigma_l = params['sigma_l']
     directions = params['directions']
     x1 = np.einsum("dj, ij -> id", directions, x1)
     x2 = np.einsum("dj, ij -> id", directions, x2)
     D = x1[:, None] - x2[None]
-    K = np.einsum('ijd, nd -> nij', np.cos(k*D), alpha / 2)
+    K = np.einsum('ijd, nd -> nij', np.cos(k*D), sigma_l / 2)
     return K
 
 
@@ -226,7 +226,7 @@ def sine(x1, x2, params):
         Description
     k : TYPE
         Description
-    alpha : TYPE
+    sigma_l : TYPE
         Description
 
     Returns
@@ -235,12 +235,12 @@ def sine(x1, x2, params):
         Description
     """
     k = params['k']
-    alpha = params['alpha']
+    sigma_l = params['sigma_l']
     directions = params['directions']
     x1 = np.einsum("dj, ij -> id", directions, x1)
     x2 = np.einsum("dj, ij -> id", directions, x2)
     D = x1[:, None] - x2[None]
-    K = np.einsum('ijd, nd -> nij', np.sin(k*D), alpha / 2)
+    K = np.einsum('ijd, nd -> nij', np.sin(k*D), sigma_l / 2)
     return K
 
 
@@ -255,7 +255,7 @@ def sine_neg(x1, x2, params):
         Description
     k : TYPE
         Description
-    alpha : TYPE
+    sigma_l : TYPE
         Description
 
     Returns
@@ -264,12 +264,12 @@ def sine_neg(x1, x2, params):
         Description
     """
     k = params['k']
-    alpha = params['alpha']
+    sigma_l = params['sigma_l']
     directions = params['directions']
     x1 = np.einsum("dj, ij -> id", directions, x1)
     x2 = np.einsum("dj, ij -> id", directions, x2)
     D = x1[:, None] - x2[None]
-    K = np.einsum('ijd, nd -> nij', -np.sin(k*D), alpha / 2)
+    K = np.einsum('ijd, nd -> nij', -np.sin(k*D), sigma_l / 2)
     return K
 
 
