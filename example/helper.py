@@ -291,13 +291,19 @@ def plot_inference_summaries(data, posterior_samples, posterior_summary):
 
 
 def plot_reconstruction(xs, x, p_true, p_predict, uncertainty):
-    ax_true = plt.subplot(131)
-    ax_predict = plt.subplot(132)
-    ax_uncertainty = plt.subplot(133)
-    agp.utils.show_soundfield(ax_true, xs.T, p_true, what=None, cmap='RdBu')
-    agp.utils.show_soundfield(
-        ax_predict, xs.T, p_predict, what=None, cmap='RdBu')
-    agp.utils.show_soundfield(ax_uncertainty, xs.T,
+    scale = 0.5
+    fig = plt.figure(constrained_layout=True, figsize = (17*scale, 5*scale))
+    spec = gridspec.GridSpec(nrows=1, ncols=17, figure=fig)
+    ax_true = fig.add_subplot(spec[:5])
+    ax_predict = fig.add_subplot(spec[5:10], sharex = ax_true, sharey = ax_true)
+    ax_cbar_soundfield = fig.add_subplot(spec[10])
+    ax_cbar_uncertainty = fig.add_subplot(spec[-1])
+    ax_uncertainty = fig.add_subplot(spec[11:-1])
+    lim = (min(p_true.min(), p_predict.min()), max(p_true.max(), p_predict.max()))
+    agp.utils.show_soundfield(ax_true, xs.T, p_true, lim = lim, what=None, cmap='RdBu')
+    im_predict = agp.utils.show_soundfield(
+        ax_predict, xs.T, p_predict, lim=lim, what=None, cmap='RdBu')
+    im_uncertainty = agp.utils.show_soundfield(ax_uncertainty, xs.T,
                               uncertainty, what=None, cmap='Greys')
 
     ax_true.set_title('true sound field')
@@ -307,4 +313,8 @@ def plot_reconstruction(xs, x, p_true, p_predict, uncertainty):
                         linestyle='', color='yellowgreen', markeredgecolor='k')
     ax_true.plot(x[:, 0], x[:, 1], marker='s', linestyle='',
                  color='yellowgreen', markeredgecolor='k')
-    plt.tight_layout()
+    plt.colorbar(im_uncertainty,cax = ax_cbar_uncertainty)
+    ax_cbar_uncertainty.set_ylabel('[Pa]')
+    plt.colorbar(im_predict, cax=ax_cbar_soundfield)
+    ax_cbar_soundfield.set_ylabel('[Pa]')
+    # plt.tight_layout()

@@ -38,7 +38,7 @@ def example():
     N = 10
 
     # Definition of sound field to reconstruct
-    
+    number_of_waves = 1
     # number of measurement repetitions (maybe several sine sweeps?)
     number_meas_reps = 1
     field_grid_rows = 26
@@ -56,7 +56,7 @@ def example():
     true_sound_field, noisy_sound_field, sound_field_parameters = plane_wave_field(
         all_locations,
         n_reps=number_meas_reps,
-        n_waves=3  # Number of plane waves that conform the field
+        n_waves=number_of_waves  # Number of plane waves that conform the field
     )
 
     # Observations: choose random locations from all_locations with Latin Hypercube Sampling
@@ -160,7 +160,7 @@ def example():
     # Show inferences
     plot_inference_summaries(data, posterior_samples, posterior_summary)
 
-    plt.show()
+    plt.show();
 
 
 if __name__ == '__main__':
