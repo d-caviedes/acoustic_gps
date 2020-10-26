@@ -5,19 +5,22 @@ import matplotlib.pyplot as plt
 import matplotlib.gridspec as gridspec
 import acoustic_gps as agp
 
+
 def varname_to_latexmath(varname):
     latex_varnames = dict(
-        alpha = '\\alpha',
-        beta = '\\beta',
-        gamma = '\\gamma',
-        tau = '\\tau',
-        rho = '\\rho',
-        sigma = '\\sigma'
+        alpha='\\alpha',
+        beta='\\beta',
+        gamma='\\gamma',
+        tau='\\tau',
+        rho='\\rho',
+        sigma='\\sigma'
     )
     if varname in latex_varnames:
         latexname = latex_varnames[varname]
-    else: latexname = varname
-    return '{'+ latexname +'}'
+    else:
+        latexname = varname
+    return '{' + latexname + '}'
+
 
 def init_model(x, kernel, n_basis_functions):
     """Load necessary parameters for both Bayesian inference and predictions
@@ -35,14 +38,14 @@ def init_model(x, kernel, n_basis_functions):
     -------
     [type]
         [description]
-    """     
+    """
     stan_params = {}
     kernel_names = {}
     kernel_params = {}
-    prior_params  = {}
+    prior_params = {}
     if kernel == 'rbf_isotropic':
         # RBF Isotropic
-        prior_params  = dict(
+        prior_params = dict(
             D=x.shape[1],
             a_tau_alpha=1,
             b_tau_alpha=1e-2,
@@ -68,7 +71,7 @@ def init_model(x, kernel, n_basis_functions):
             (np.cos(angles[:, None]), np.sin(angles[:, None])), axis=-1
         )
 
-        prior_params  = dict(
+        prior_params = dict(
             D=posible_directions.shape[0],
             a_tau_alpha=1,
             b_tau_alpha=1e-2,
@@ -89,7 +92,7 @@ def init_model(x, kernel, n_basis_functions):
         posible_directions = np.concatenate(
             (np.cos(angles[:, None]), np.sin(angles[:, None])), axis=-1
         )
-        prior_params  = dict(
+        prior_params = dict(
             D=posible_directions.shape[0],
             a_tau_alpha=1,
             b_tau_alpha=1e-2,
@@ -99,9 +102,9 @@ def init_model(x, kernel, n_basis_functions):
         )
 
     if kernel == 'plane_wave_hierarchical':
-        stan_params= ["sigma_l", "b_log"]
-        kernel_names= ["cosine", "cosine", "sine", "sine_neg"]
-        kernel_params= ["sigma_l"]
+        stan_params = ["sigma_l", "b_log"]
+        kernel_names = ["cosine", "cosine", "sine", "sine_neg"]
+        kernel_params = ["sigma_l"]
         # PLANE WAVE
         # Whole circle
         angle_range = 2 * np.pi
@@ -114,8 +117,8 @@ def init_model(x, kernel, n_basis_functions):
             D=posible_directions.shape[0],
             wave_directions=posible_directions,
             a=1,
-            b_log_mean = 2, # prior mean of the b_log hyperparameter
-            b_log_std= 1 # prior std of the b_log hyperparameter
+            b_log_mean=2,  # prior mean of the b_log hyperparameter
+            b_log_std=1  # prior std of the b_log hyperparameter
         )
 
     if kernel == 'bessel_isotropic':
@@ -123,21 +126,22 @@ def init_model(x, kernel, n_basis_functions):
         kernel_names = ["bessel0", "bessel0", "zero", "zero"]
         kernel_params = ["sigma"]
         # Sinc
-        prior_params  = dict(
+        prior_params = dict(
             D=x.shape[1],
             a_tau_sigma=1,
             b_tau_sigma=1e-2,
         )
     return kernel_names, kernel_params, prior_params, stan_params
 
+
 def plane_wave_field(
-                xs,
-                n_waves = 1,
-                snr=20, 
-                n_reps=1,
-                f = np.array([300]),
-                c = 343
-                ):
+    xs,
+    n_waves=1,
+    snr=20,
+    n_reps=1,
+    f=np.array([300]),
+    c=343
+):
     k = 2 * np.pi * f / c
     snr = 30
     setup = {}
@@ -158,17 +162,17 @@ def plane_wave_field(
     setup['wave_direction'] = wave_direction
     setup['wave_amplitude'] = wave_amplitude
 
-    norm = np.mean(np.abs(p_clean), axis = -1)
+    norm = np.mean(np.abs(p_clean), axis=-1)
     p_clean /= norm[:, None]
-    p_mean = np.mean(np.abs(p_clean), axis = -1)
+    p_mean = np.mean(np.abs(p_clean), axis=-1)
     noise_std = p_mean / (10**(snr/20))
-    noise = np.einsum('f, rx -> rfx',noise_std, (
-            np.random.randn(n_reps, xs.shape[0]) +
-            1j * np.random.randn(n_reps, xs.shape[0])
-        ))
+    noise = np.einsum('f, rx -> rfx', noise_std, (
+        np.random.randn(n_reps, xs.shape[0]) +
+        1j * np.random.randn(n_reps, xs.shape[0])
+    ))
     p = p_clean[None] + noise
     setup['noise'] = noise
-    setup['noise_std'] = noise_std        
+    setup['noise_std'] = noise_std
     setup['norm'] = norm
     setup['xs'] = xs
     setup['f'] = f
@@ -176,9 +180,10 @@ def plane_wave_field(
 
     return p_clean, p, setup
 
+
 def get_sparse_microphones(n_mics, n_rows, x_first=0, x_last=1, y_first=0, y_last=1):
     """Use Latin Hyper Cube to randomize the chosen microphone positions in a rectangular space.
-    
+
     Parameters
     ----------
     n_mics : int
@@ -193,7 +198,7 @@ def get_sparse_microphones(n_mics, n_rows, x_first=0, x_last=1, y_first=0, y_las
         First column to include
     y_last : int
         Last column to include
-    
+
     Returns
     -------
     i_mics : array
@@ -205,8 +210,10 @@ def get_sparse_microphones(n_mics, n_rows, x_first=0, x_last=1, y_first=0, y_las
     if n_mics > 0:
         while len(np.unique(i_mics)) < n_mics:
             i_mics = lhs(2, samples=n_mics * i, criterion="center")
-            i_mics[:, 0] = np.floor(i_mics[:, 0] * grid[0]).astype(int) + int(x_first)
-            i_mics[:, 1] = np.floor(i_mics[:, 1] * grid[1]).astype(int) + int(y_first)
+            i_mics[:, 0] = np.floor(
+                i_mics[:, 0] * grid[0]).astype(int) + int(x_first)
+            i_mics[:, 1] = np.floor(
+                i_mics[:, 1] * grid[1]).astype(int) + int(y_first)
             # Convert coordinates to indices
             i_mics = (i_mics[:, 1] * n_rows + i_mics[:, 0]).astype(int)
             i += 1
@@ -215,15 +222,17 @@ def get_sparse_microphones(n_mics, n_rows, x_first=0, x_last=1, y_first=0, y_las
         i_mics = []
     return i_mics
 
+
 def random_locations(n_mics_zone, n_rows, n_cols):
     x_first = 0  # First row to take into account
     x_last = n_rows  # Last row to take into account
     y_first = 0  # First column
-    y_last = n_cols # Last column
+    y_last = n_cols  # Last column
     i_mics = get_sparse_microphones(
         n_mics_zone, n_rows, x_first, x_last, y_first, y_last
     )
     return i_mics.astype(int)
+
 
 def plot_inference_summaries(data, posterior_samples, posterior_summary):
     rhat_color = 'C3'
@@ -245,7 +254,8 @@ def plot_inference_summaries(data, posterior_samples, posterior_summary):
             if label.startswith(key)
         ]
         col = list(posterior_summary["summary_colnames"]).index("Rhat")
-        bplot = ax[i].boxplot(posterior_samples[key], showfliers=False, zorder=1, patch_artist=True)
+        bplot = ax[i].boxplot(posterior_samples[key],
+                              showfliers=False, zorder=1, patch_artist=True)
         for patch in bplot["boxes"]:
             patch.set_facecolor("gray")
         ax2 = ax[i].twinx()
@@ -261,7 +271,8 @@ def plot_inference_summaries(data, posterior_samples, posterior_summary):
         ax2.set_ylim(0.6, 1.4)
         ax2.set_ylabel(r"Convergence, $\hat{R}$", color=rhat_color)
         if len(row) > 1:
-            direction_key = [j for j in list(data.keys()) if "direction" in j][0]
+            direction_key = [j for j in list(
+                data.keys()) if "direction" in j][0]
             angles = np.arctan2(
                 data[direction_key][:, -1], data[direction_key][:, 0]
             )
@@ -278,17 +289,22 @@ def plot_inference_summaries(data, posterior_samples, posterior_summary):
 
     plt.show()
 
+
 def plot_reconstruction(xs, x, p_true, p_predict, uncertainty):
     ax_true = plt.subplot(131)
     ax_predict = plt.subplot(132)
     ax_uncertainty = plt.subplot(133)
-    agp.utils.show_soundfield(ax_true, xs.T, p_true, what = None, cmap = 'RdBu')
-    agp.utils.show_soundfield(ax_predict, xs.T, p_predict, what = None, cmap = 'RdBu')
-    agp.utils.show_soundfield(ax_uncertainty, xs.T, uncertainty, what = None, cmap='Greys')
-    
+    agp.utils.show_soundfield(ax_true, xs.T, p_true, what=None, cmap='RdBu')
+    agp.utils.show_soundfield(
+        ax_predict, xs.T, p_predict, what=None, cmap='RdBu')
+    agp.utils.show_soundfield(ax_uncertainty, xs.T,
+                              uncertainty, what=None, cmap='Greys')
+
     ax_true.set_title('true sound field')
     ax_predict.set_title('mean prediction')
     ax_uncertainty.set_title('uncertainty')
-    ax_uncertainty.plot(x[:, 0], x[:, 1], marker='s', linestyle = '', color = 'yellowgreen', markeredgecolor = 'k')
-    ax_true.plot(x[:, 0], x[:, 1], marker='s', linestyle = '', color = 'yellowgreen', markeredgecolor = 'k')
+    ax_uncertainty.plot(x[:, 0], x[:, 1], marker='s',
+                        linestyle='', color='yellowgreen', markeredgecolor='k')
+    ax_true.plot(x[:, 0], x[:, 1], marker='s', linestyle='',
+                 color='yellowgreen', markeredgecolor='k')
     plt.tight_layout()

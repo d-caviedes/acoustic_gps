@@ -23,11 +23,11 @@ def rbf_isotropic(x1, x2, params):
     """
     alpha = params['alpha']
     rho = params['rho']
-    
+
     D = x1[:, None] - x2[None]
-    
-    if len(np.shape(rho))==1: # Isotropic
-        rho = np.repeat(rho[:, None], D.shape[-1], axis = -1)
+
+    if len(np.shape(rho)) == 1:  # Isotropic
+        rho = np.repeat(rho[:, None], D.shape[-1], axis=-1)
 
     K = np.einsum(
         'n, nij -> nij',
@@ -41,6 +41,7 @@ def rbf_isotropic(x1, x2, params):
         )
     )
     return K
+
 
 def rbf_anisotropic(x1, x2, params):
     """Radial basis function iso and anisotropic
@@ -79,6 +80,7 @@ def rbf_anisotropic(x1, x2, params):
         )
     )
     return K
+
 
 def rbf_anisotropic_periodic(x1, x2, params):
     """Radial basis function iso and anisotropic
@@ -119,6 +121,7 @@ def rbf_anisotropic_periodic(x1, x2, params):
     )
     return K
 
+
 def sinc(x1, x2, params):
     """Summary
 
@@ -137,8 +140,10 @@ def sinc(x1, x2, params):
     k = params['k']
     alpha = params['alpha']
     D = x1[:, None] - x2[None]
-    K = np.einsum('n, ij -> nij',alpha ** 2, np.sinc(k*np.sqrt(np.sum(D**2, axis=-1))/(np.pi)))
+    K = np.einsum('n, ij -> nij', alpha ** 2, np.sinc(k *
+                                                      np.sqrt(np.sum(D**2, axis=-1))/(np.pi)))
     return K
+
 
 def bessel0(x1, x2, params):
     """Summary
@@ -158,35 +163,10 @@ def bessel0(x1, x2, params):
     k = params['k']
     sigma = params['sigma']
     D = x1[:, None] - x2[None]
-    K = np.einsum('n, ij -> nij',sigma ** 2, sc.special.jv(0, k*np.sqrt(np.sum(D**2, axis=-1))))
+    K = np.einsum('n, ij -> nij', sigma ** 2,
+                  sc.special.jv(0, k*np.sqrt(np.sum(D**2, axis=-1))))
     return K
-
-
-# def plane_wave(x1, x2, k, alpha):
-#     """Summary
-
-#     Parameters
-#     ----------
-#     x1 : TYPE
-#         Description
-#     x2 : TYPE
-#         Description
-#     k : TYPE
-#         Description
-#     alpha : TYPE
-#         Description
-
-#     Returns
-#     -------
-#     TYPE
-#         Description
-#     """
-#     x1_proj = np.einsum("ij, kj -> ik", k, x1)
-#     x2_proj = np.einsum("ij, kj -> ik", k, x2)
-#     D = x1_proj[:, :, None] - x2_proj[:, None]
-#     K = np.sum(alpha[:, None, None] * np.exp(-1j * D), axis=0)
-#     return K
-
+    
 
 def cosine(x1, x2, params):
     """Summary

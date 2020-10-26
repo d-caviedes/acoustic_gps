@@ -13,14 +13,16 @@ import os
 BASE_DIRS = os.path.dirname(__file__)
 STAN_MODELS = os.path.join(BASE_DIRS + os.sep, 'stan_models')
 COMPILED_STAN_MODELS = os.path.join(STAN_MODELS + os.sep, 'compiled')
-def show_soundfield_3D(ax_, 
-                    xs, 
-                    p, 
-                    lim=None, 
-                    what = 'phase',
-                    **kwargs):
+
+
+def show_soundfield_3D(ax_,
+                       xs,
+                       p,
+                       lim=None,
+                       what='phase',
+                       **kwargs):
     """Summary
-    
+
     Parameters
     ----------
     ax_ : TYPE
@@ -35,7 +37,7 @@ def show_soundfield_3D(ax_,
         Description
     **kwargs
         Description
-    
+
     Returns
     -------
     TYPE
@@ -65,9 +67,10 @@ def show_soundfield_3D(ax_,
     ax_.set_aspect("equal")
     return cs
 
-def grid_data(r_xy, 
-            z,
-            density):
+
+def grid_data(r_xy,
+              z,
+              density):
     """Summary
     """
     xmin, ymin = r_xy.min(axis=1)
@@ -82,14 +85,14 @@ def grid_data(r_xy,
     return Xg, Yg, Zg
 
 
-def show_soundfield(ax_, 
-                    r_xy, 
-                    p, 
-                    lim=None, 
-                    what = 'phase',
+def show_soundfield(ax_,
+                    r_xy,
+                    p,
+                    lim=None,
+                    what='phase',
                     **kwargs):
     """Summary
-    
+
     Parameters
     ----------
     ax_ : TYPE
@@ -104,7 +107,7 @@ def show_soundfield(ax_,
         Description
     **kwargs
         Description
-    
+
     Returns
     -------
     TYPE
@@ -130,17 +133,19 @@ def show_soundfield(ax_,
         (r_xy[0], r_xy[1]), z, (Xg.ravel(), Yg.ravel()), method="cubic"
     )
     Zg = zg.reshape(Xg.shape)
-    
+
     cs = ax_.pcolormesh(Xg, Yg, Zg, vmin=lim[0], vmax=lim[1], **kwargs)
     ax_.set_aspect("equal")
     return cs
 
+
 def db_spl(p):
     return 20 * np.log10(np.abs(p)/2e-5)
 
+
 def stack_block_covariance(Krr, Kri, Kir, Kii):
     """Summary
-    
+
     Parameters
     ----------
     Krr : TYPE
@@ -151,7 +156,7 @@ def stack_block_covariance(Krr, Kri, Kir, Kii):
         Description
     Kii : TYPE
         Description
-    
+
     Returns
     -------
     TYPE
@@ -164,9 +169,10 @@ def stack_block_covariance(Krr, Kri, Kir, Kii):
     )
     return K
 
+
 def complex_covariance_from_real(Krr, Kii, Kri):
     """Summary
-    
+
     Parameters
     ----------
     Krr : TYPE
@@ -175,7 +181,7 @@ def complex_covariance_from_real(Krr, Kii, Kri):
         Description
     Kri : TYPE
         Description
-    
+
     Returns
     -------
     TYPE
@@ -184,6 +190,7 @@ def complex_covariance_from_real(Krr, Kii, Kri):
     K = Krr + Kii + 1j * (Kri.T - Kri)
     Kp = Krr - Kii + 1j * (Kri.T + Kri)
     return K, Kp
+
 
 def split_covariance_in_blocks(K):
     """Summary
@@ -201,16 +208,17 @@ def split_covariance_in_blocks(K):
 
     return K_top_left, K_top_right, K_bottom_left, K_bottom_right
 
-def show_kernel(ax, 
-                kernel_name, 
-                x = np.linspace(0, 10, 100), 
-                color = 'C0',
-                alpha = 1,
-                normalize=False, 
+
+def show_kernel(ax,
+                kernel_name,
+                x=np.linspace(0, 10, 100),
+                color='C0',
+                alpha=1,
+                normalize=False,
                 dim='1D',
                 **kwargs):
     """Summary
-    
+
     Parameters
     ----------
     ax : TYPE
@@ -231,10 +239,12 @@ def show_kernel(ax,
 
     if normalize:
         K /= np.max(K)
-    if dim=='1D':
-        ax.plot(x, K[0, 0], label=kernel_name, color = color, alpha = alpha)
-    if dim=='2D':
-        ax.imshow(K[0], extent= [x[:, 0].min(), x[:, 0].max(), x[:, 1].min(), x[:, 1].max()])
+    if dim == '1D':
+        ax.plot(x, K[0, 0], label=kernel_name, color=color, alpha=alpha)
+    if dim == '2D':
+        ax.imshow(K[0], extent=[x[:, 0].min(), x[:, 0].max(),
+                                x[:, 1].min(), x[:, 1].max()])
+
 
 def compute_kernel(kernel_name,
                    x=np.linspace(0, 10, 100),
@@ -243,11 +253,12 @@ def compute_kernel(kernel_name,
     K = k(x1=x, x2=x, **kwargs)
     return K
 
-def compile_model(model_name, 
-                  model_path=STAN_MODELS, 
+
+def compile_model(model_name,
+                  model_path=STAN_MODELS,
                   compiled_save_path=COMPILED_STAN_MODELS):
     """Summary
-    
+
     Parameters
     ----------
     model_name : TYPE
@@ -262,14 +273,18 @@ def compile_model(model_name,
     # Stan compilation
     model = pystan.StanModel(model_code=model_code)
     # Save model
-    pickle.dump(model, open(os.path.join(compiled_save_path, model_name + ".pkl"), "wb"))
+    pickle.dump(model, open(os.path.join(
+        compiled_save_path, model_name + ".pkl"), "wb"))
+
 
 def nmse(y_meas, y_predicted, axis=(-1,)):
     norm = 1
     for i in axis:
         norm *= y_meas.shape[i]
-    nmse = np.sum(np.abs(y_meas - y_predicted)**2/np.abs(y_meas)**2, axis = axis) / norm
+    nmse = np.sum(np.abs(y_meas - y_predicted)**2 /
+                  np.abs(y_meas)**2, axis=axis) / norm
     return nmse
+
 
 def find_nearest(array, value):
     """Find nearest value in an array and its index.
@@ -286,11 +301,12 @@ def find_nearest(array, value):
         idx.append((np.abs(array - val)).argmin())
     return array[idx], idx
 
-def plot_kde(ax, y, resolution = 1000, **kwargs):
+
+def plot_kde(ax, y, resolution=1000, **kwargs):
     xmin = min(y)
     xmax = max(y)
     xvector = np.linspace(xmin, xmax, resolution)
     Y_kde = stats.gaussian_kde(y)
     ax.plot(
-            xvector, Y_kde.pdf(xvector) / Y_kde.pdf(xvector).max(), **kwargs
-        )
+        xvector, Y_kde.pdf(xvector) / Y_kde.pdf(xvector).max(), **kwargs
+    )

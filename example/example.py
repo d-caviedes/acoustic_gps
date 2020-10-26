@@ -37,9 +37,8 @@ def example():
     # number of observations
     N = 10
 
-    # %%
     # Definition of sound field to reconstruct
-
+    
     # number of measurement repetitions (maybe several sine sweeps?)
     number_meas_reps = 1
     field_grid_rows = 26
@@ -142,13 +141,13 @@ def example():
     )
 
     predicted_mean = (
-                        bivariate_predicted_mean[
-                            :, :all_locations.shape[0]
-                            ] + 
-                        1j*bivariate_predicted_mean[
-                            :, all_locations.shape[0]:
-                            ]
-                    )
+        bivariate_predicted_mean[
+            :, :all_locations.shape[0]
+        ] +
+        1j*bivariate_predicted_mean[
+            :, all_locations.shape[0]:
+        ]
+    )
     Krr, Kri, Kir, Kii = agp.utils.split_covariance_in_blocks(
         bivariate_predicted_covariance)
     predicted_covariance = Krr+Kii+1j*(Kir-Kri)

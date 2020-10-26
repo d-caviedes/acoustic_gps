@@ -12,11 +12,13 @@ BASE_DIRS = os.path.dirname(__file__)
 STAN_MODELS = os.path.join(BASE_DIRS + os.sep, 'stan_models')
 COMPILED_STAN_MODELS = os.path.join(STAN_MODELS + os.sep, 'compiled')
 
+
 def predict(x,
             xs,
             y,
             Sigma,  # noise
-            kernel_names=['rbf', 'rbf', 'zero', 'zero'],  # [uu, vv, uv, vu] TODO: Change to dictionary instead of positional
+            # [uu, vv, uv, vu] TODO: Change to dictionary instead of positional
+            kernel_names=['rbf', 'rbf', 'zero', 'zero'],
             axis=-1,
             delta=1e-12,
             sample=False,
@@ -98,21 +100,22 @@ def predict(x,
                      'nij, nkj -> nik',
                      np.linalg.inv(K_zz + Sigma),
                      K_zsz)
-                )
+             )
              )
     if sample:
         delta_ = np.copy(delta)
         cholesky = np.empty(y_cov.shape)
         for i in range(y_mean.shape[0]):
             while True:
-                try: 
+                try:
                     cholesky[i] = np.linalg.cholesky(y_cov[i])
                     break
                 except np.linalg.LinAlgError:
                     y_cov[i] += delta_ * np.identity(y_mean.shape[-1])
                     delta_ *= 10
-            delta_ = np.copy(delta)              
-        y_samples = (y_mean + np.einsum('nij, nj -> ni', cholesky, np.random.randn(*y_mean.shape)))
+            delta_ = np.copy(delta)
+        y_samples = (y_mean + np.einsum('nij, nj -> ni',
+                                        cholesky, np.random.randn(*y_mean.shape)))
         del cholesky
     else:
         y_samples = []
@@ -128,8 +131,9 @@ def mc_sampling(
         warmup_samples=150,
         chains=3,
         pars=['alpha']
-        ):
-    model = pickle.load(open(os.path.join(COMPILED_STAN_MODELS + os.sep, kernel + '.pkl'), "rb"))
+):
+    model = pickle.load(
+        open(os.path.join(COMPILED_STAN_MODELS + os.sep, kernel + '.pkl'), "rb"))
 
     posterior_ = model.sampling(
         data=data,
@@ -138,25 +142,26 @@ def mc_sampling(
         chains=chains,
         pars=pars
     )
-    posterior_samples = posterior_.extract(pars = pars, permuted=True)
-    posterior_summary = posterior_.summary(pars = pars)
+    posterior_samples = posterior_.extract(pars=pars, permuted=True)
+    posterior_summary = posterior_.summary(pars=pars)
     return posterior_samples, posterior_summary
 
-def map_estimation(model_path, # TODO: implement this properly
-        data,
-        seed = 1000,
-        iter = 1e6,
-        algorithm = 'LBFGS',
-        tol_rel_grad = 1e7
 
-        ):
+def map_estimation(model_path,  # TODO: implement this properly
+                   data,
+                   seed=1000,
+                   iter=1e6,
+                   algorithm='LBFGS',
+                   tol_rel_grad=1e7
+
+                   ):
     model = pickle.load(open(model_path, "rb"))
 
     map = model.optimizing(
         data=data,
-        seed=seed, 
+        seed=seed,
         iter=iter,
         algorithm=algorithm,
-        tol_rel_grad = tol_rel_grad
+        tol_rel_grad=tol_rel_grad
     )
     return map
