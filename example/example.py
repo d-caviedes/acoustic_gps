@@ -20,7 +20,7 @@ rc('text', usetex=True)
 # TODO: Explain how Bivariate to Complex works in the code.
 # TODO: Comment code properly
 # TODO: Header and paper citing at the top (any CC license)?
-# TODO: Reconstruction plot -> colorbars. axis labels?
+# TODO: Reconstruction plot -> colorbars. axis labels
 
 parser = argparse.ArgumentParser(description=__doc__,
                                  formatter_class=argparse.RawDescriptionHelpFormatter)
