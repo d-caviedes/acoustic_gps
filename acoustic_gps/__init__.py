@@ -6,7 +6,11 @@ from . import kernels
 from . import utils
 import pickle
 import pystan
+import os
 
+BASE_DIRS = os.path.dirname(__file__)
+STAN_MODELS = os.path.join(BASE_DIRS + os.sep, 'stan_models')
+COMPILED_STAN_MODELS = os.path.join(STAN_MODELS + os.sep, 'compiled')
 
 def predict(x,
             xs,
@@ -116,14 +120,16 @@ def predict(x,
     return y_mean, y_cov, y_samples
 
 
-def mc_sampling(model_path,
+def mc_sampling(
         data,
+        kernel=['rbf_isotropic'],
+        model_path=COMPILED_STAN_MODELS,
         n_samples=300,
         warmup_samples=150,
         chains=3,
         pars=['alpha']
         ):
-    model = pickle.load(open(model_path, "rb"))
+    model = pickle.load(open(os.path.join(COMPILED_STAN_MODELS + os.sep, kernel + '.pkl'), "rb"))
 
     posterior_ = model.sampling(
         data=data,

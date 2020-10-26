@@ -8,7 +8,11 @@ from . import kernels
 import pystan
 import pickle
 from scipy import stats
+import os
 
+BASE_DIRS = os.path.dirname(__file__)
+STAN_MODELS = os.path.join(BASE_DIRS + os.sep, 'stan_models')
+COMPILED_STAN_MODELS = os.path.join(STAN_MODELS + os.sep, 'compiled')
 def show_soundfield_3D(ax_, 
                     xs, 
                     p, 
@@ -239,7 +243,9 @@ def compute_kernel(kernel_name,
     K = k(x1=x, x2=x, **kwargs)
     return K
 
-def compile_model(model_name, model_path, compiled_save_path):
+def compile_model(model_name, 
+                  model_path=STAN_MODELS, 
+                  compiled_save_path=COMPILED_STAN_MODELS):
     """Summary
     
     Parameters
@@ -251,14 +257,12 @@ def compile_model(model_name, model_path, compiled_save_path):
     compiled_save_path : TYPE
         Description
     """
-    # model_path = pathlib.Path(model_path)
-    # model_name = pathlib.Path(model_name)
-    with open(model_path+model_name+'.stan', "r") as f:
+    with open(os.path.join(model_path+os.sep, model_name+'.stan'), "r") as f:
         model_code = f.read()
     # Stan compilation
     model = pystan.StanModel(model_code=model_code)
     # Save model
-    pickle.dump(model, open(compiled_save_path + model_name + ".pkl", "wb"))
+    pickle.dump(model, open(os.path.join(compiled_save_path, model_name + ".pkl"), "wb"))
 
 def nmse(y_meas, y_predicted, axis=(-1,)):
     norm = 1
