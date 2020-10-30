@@ -29,4 +29,5 @@ setup(
     	"pystan",
         "pyDOE"
     ],
+    include_package_data=True
 )
