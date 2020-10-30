@@ -131,13 +131,14 @@ def mc_sampling(
         chains=3,
         pars=['alpha']
 ):
-    
+        compiled_model_pkl = os.path.join(COMPILED_STAN_MODELS + os.sep, kernel + '.pkl')
     try:
-        model = pickle.load(
-        open(os.path.join(COMPILED_STAN_MODELS + os.sep, kernel + '.pkl'), "rb"))
+        _file = open(compile_model_pkl, "rb")
     except FileNotFoundError:
-        print('Please ensure that the Stan model was compiled.')
+        print('Please ensure that the Stan model was compiled and the Pickle file exists.')
         return
+    else:
+        model = pickle.load(_file)
 
     posterior_ = model.sampling(
         data=data,
