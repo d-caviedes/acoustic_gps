@@ -21,6 +21,7 @@ rc('text', usetex=True)
 # TODO: Comment code properly
 # TODO: Header and paper citing at the top (any CC license)?
 # TODO: Reconstruction plot -> colorbars. axis labels
+# TODO: Create folder if it doesn't exist
 
 parser = argparse.ArgumentParser(description=__doc__,
                                  formatter_class=argparse.RawDescriptionHelpFormatter)
@@ -67,10 +68,10 @@ def example():
     # choose "kernel" (uncomment one)
     kernel = [
         # 'plane_wave_hierarchical',
-        'bessel_isotropic',
+        # 'bessel_isotropic',
         # 'rbf_isotropic',
         # 'rbf_anisotropic',
-        # 'rbf_anisotropic_periodic',
+        'rbf_anisotropic_periodic',
     ][0]
 
     # Stan models need to be compiled before executed (it runs on C).
