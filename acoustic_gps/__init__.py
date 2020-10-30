@@ -131,9 +131,14 @@ def mc_sampling(
         chains=3,
         pars=['alpha']
 ):
-    model = pickle.load(
+    
+    try:
+        model = pickle.load(
         open(os.path.join(COMPILED_STAN_MODELS + os.sep, kernel + '.pkl'), "rb"))
-
+    except IOError:
+        print('Please ensure that the Stan model was compiled.')
+        return
+        
     posterior_ = model.sampling(
         data=data,
         iter=n_samples,
