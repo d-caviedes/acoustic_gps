@@ -17,6 +17,7 @@ be easily adapted for the reconstruction of other fields such as
 electromagnetic.
 """
 from distutils.core import setup  # nopep8
+import sys
 setup(
     author="Diego Caviedes Nozal",
     name="acoustic_gps",
@@ -26,8 +27,9 @@ setup(
         "numpy",
         "scipy",
         "matplotlib",
-    	"pystan",
-        "pyDOE"
+        "pyDOE",
+        "pystan == 2.18.0; platform_system=='Windows'",
+        "pystan; platform_system!='Windows'"
     ],
     include_package_data=True
 )
