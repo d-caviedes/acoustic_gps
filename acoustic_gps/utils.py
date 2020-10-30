@@ -14,6 +14,9 @@ BASE_DIRS = os.path.dirname(__file__)
 STAN_MODELS = os.path.join(BASE_DIRS + os.sep, 'stan_models')
 COMPILED_STAN_MODELS = os.path.join(STAN_MODELS + os.sep, 'compiled')
 
+if not os.path.exists(COMPILED_STAN_MODELS):
+    os.makedirs(COMPILED_STAN_MODELS)
+
 
 def show_soundfield_3D(ax_,
                        xs,
