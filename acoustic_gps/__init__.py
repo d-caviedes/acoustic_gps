@@ -131,7 +131,7 @@ def mc_sampling(
         chains=3,
         pars=['alpha']
 ):
-        compiled_model_pkl = os.path.join(COMPILED_STAN_MODELS + os.sep, kernel + '.pkl')
+    compiled_model_pkl = os.path.join(COMPILED_STAN_MODELS + os.sep, kernel + '.pkl')
     try:
         _file = open(compile_model_pkl, "rb")
     except FileNotFoundError:
