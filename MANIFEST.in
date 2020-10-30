@@ -1,0 +1,2 @@
+include README.md LICENSE.md
+recursive-include acoustic_gps/stan_models *.stan
