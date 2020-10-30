@@ -135,10 +135,10 @@ def mc_sampling(
     try:
         model = pickle.load(
         open(os.path.join(COMPILED_STAN_MODELS + os.sep, kernel + '.pkl'), "rb"))
-    except IOError:
+    except FileNotFoundError:
         print('Please ensure that the Stan model was compiled.')
         return
-        
+
     posterior_ = model.sampling(
         data=data,
         iter=n_samples,
