@@ -133,7 +133,7 @@ def mc_sampling(
 ):
     compiled_model_pkl = os.path.join(COMPILED_STAN_MODELS + os.sep, kernel + '.pkl')
     try:
-        _file = open(compile_model_pkl, "rb")
+        _file = open(compiled_model_pkl, "rb")
     except FileNotFoundError:
         print('Please ensure that the Stan model was compiled and the Pickle file exists.')
         return
