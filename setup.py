@@ -28,7 +28,7 @@ setup(
         "scipy",
         "matplotlib",
         "pyDOE",
-        "pystan == 2.18.0; platform_system=='Windows'",
+        "pystan == 2.18.0.0; platform_system=='Windows'",
         "pystan; platform_system!='Windows'"
     ],
     include_package_data=True
