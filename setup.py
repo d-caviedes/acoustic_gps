@@ -21,7 +21,7 @@ setup(
     author="Diego Caviedes Nozal",
     name="acoustic_gps",
     version="0.1",
-    packages=["acoustic_gps"],
+    packages=["acoustic_gps", "acoustic_gps.stan_models","example"],
     install_requires=[
         "numpy",
         "scipy",
