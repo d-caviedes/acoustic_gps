@@ -12,6 +12,11 @@ BASE_DIRS = os.path.dirname(__file__)
 STAN_MODELS = os.path.join(BASE_DIRS + os.sep, 'stan_models')
 COMPILED_STAN_MODELS = os.path.join(STAN_MODELS + os.sep, 'compiled')
 
+try:
+    os.makedirs(COMPILED_STAN_MODELS)
+except OSError as e:
+    if e.errno != errno.EEXIST:
+        raise
 
 def predict(x,
             xs,
