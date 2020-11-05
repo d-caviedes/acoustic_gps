@@ -15,9 +15,10 @@ from helper import *
 from matplotlib import rc
 from distutils.spawn import find_executable
 import os
+from distutils.spawn import find_executable
 
 rc('font', **{'family': 'serif', 'serif': ['Computer Modern Roman']})
-if find_executable('latex'): 
+if find_executable('latex'):
     print("latex installed")
     rc('text', usetex=True)
 
@@ -40,7 +41,7 @@ def example():
     # number of basis kernels (for anisotropic kernels)
     L = 64
     # number of observations
-    N = 10
+    N = 5
 
     # Definition of sound field to reconstruct
     number_of_waves = 1
@@ -71,18 +72,18 @@ def example():
 
     # choose "kernel" (uncomment one)
     kernel = [
-        # 'plane_wave_hierarchical',
+        'plane_wave_hierarchical',
         # 'bessel_isotropic',
         # 'rbf_isotropic',
         # 'rbf_anisotropic',
-        'rbf_anisotropic_periodic',
+        # 'rbf_anisotropic_periodic',
     ][0]
 
     # Stan models need to be compiled before executed (it runs on C).
     # Once the model is compiled, there is no need to compile it again
     # to make inferences. If changes are made in the .stan code,
     # compilation is needed for them to take effect.
-    compile = False
+    compile = True
 
     if compile is True:
         agp.utils.compile_model(
