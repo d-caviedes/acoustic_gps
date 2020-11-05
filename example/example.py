@@ -13,9 +13,13 @@ import numpy as np
 from matplotlib import pyplot as plt
 from helper import *
 from matplotlib import rc
+from distutils.spawn import find_executable
 import os
+
 rc('font', **{'family': 'serif', 'serif': ['Computer Modern Roman']})
-rc('text', usetex=True)
+if find_executable('latex'): 
+    print("latex installed")
+    rc('text', usetex=True)
 
 # TODO: Explain how Bivariate to Complex works in the code.
 # TODO: Comment code properly
